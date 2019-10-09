@@ -1,5 +1,4 @@
 from os import system, name
-import pyautogui
 import keyboard
 from pynput.keyboard import Key, Controller
 mykeyboard = Controller()
