@@ -39,18 +39,20 @@ ball_y = 3
 x_speed = 1
 y_speed = 1
 
+ball_sprite = 'O'
 
 def position_paddle1():
     cells[str(paddle1_y)][1] = 'X'
 
 def position_ball():
-    cells[str(ball_y)][ball_x] = 'O'
+    cells[str(ball_y)][ball_x] = ball_sprite
 
 
 def draw_board():
     for row in cells:
         column = cells[row]
         print(''.join([x for x in column]))
+    print(ball_x)
 
 def get_input():
     global paddle1_y
@@ -61,10 +63,16 @@ def get_input():
         cells[str(paddle1_y)][1] = '|'
         paddle1_y -= 1
 
+def check_collisions():
+    if ball_x < 7:
+        ball_sprite = 'L'
+    elif ball_x > 7:
+        ball_sprite = 'R'
+
 while True:
     if ball_x > 10:
         x_speed = -1
-    if ball_x < 2:
+    if ball_x < 3:
         x_speed = 1
     if ball_y < 1:
         y_speed = 1
@@ -72,13 +80,12 @@ while True:
         y_speed = -1
     ball_x += x_speed
     ball_y += y_speed
+    check_collisions()
     draw_board()
     get_input()
     position_paddle1()
     cells[str((ball_y - y_speed))][ball_x - x_speed] = ' '
     position_ball()
-    #print((' ' * abs(int(math.sin(i)*ball_speed))) + 'O')
     sleep(0.1)
-    #i += 1
     clear()
 
