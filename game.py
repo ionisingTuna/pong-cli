@@ -1,35 +1,33 @@
-import sys
-from os import system, name
-import keyboard
+### These imports are specifically suited for a Windows environment.
 from pynput.keyboard import Key, Controller
+from os import system, name
 mykeyboard = Controller()
+import keyboard
+import sys
 
-from cursesmenu import *
 from cursesmenu.items import *
-
-import math
-
-import curses
-
+from cursesmenu import *
 from curses import panel
+import curses
 
 from time import sleep
 
+import math
+### End of Imports.
+
+# Window Width & Length
+w_width  = 40
+w_height = 10
+
 i = 0
 
-cells = {
-        '0': [' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' '],
-        '1': [' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' '],
-        '2': [' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' '],
-        '3': [' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' '],
-        '4': [' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' '],
-        '5': [' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' '],
-        '6': [' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' '],
-        '7': [' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ']
-        }
+# Cells responsible for the drawing of the board.
+cells = {}
 
-    
-
+for i in range(w_height):
+    cells[i] = [' '] * w_width
+    cells[i][1] = '|'
+    cells[i][w_width -2] = '|'
 
 def clear():
     if name == 'nt':
@@ -37,13 +35,24 @@ def clear():
     else:
         _ = system('clear')
 
+ball_speed = 25
+randomness = 3
+
+paddle1_y = 3
+paddle2_y = 4
+
+ball_x = 3
+ball_y = 3
+
+x_speed = 1
+y_speed = 1
 
 def position_paddle1():
-    cells[str(paddle1_y)][1] = 'X'
+    cells[paddle1_y][1] = 'X'
 
 def position_ball():
-    cells[str(ball_y)][ball_x] = ball_sprite
-
+    if cells[ball_y][ball_x] != '|':
+        cells[ball_y][ball_x] = 'O'
 
 def draw_board():
     for row in cells:
@@ -62,25 +71,6 @@ def get_input():
     if keyboard.is_pressed('z'):
         sys.exit()
 
-def check_collisions():
-    if ball_x < 7:
-        ball_sprite = 'L'
-    elif ball_x > 7:
-        ball_sprite = 'R'
-
-ball_speed = 25
-randomness = 3
-
-paddle1_y = 3
-paddle2_y = 4
-
-ball_x = 3
-ball_y = 3
-
-x_speed = 1
-y_speed = 1
-
-ball_sprite = 'O'
 
 def game():
     global ball_speed
@@ -93,21 +83,20 @@ def game():
     global y_speed
     clear()
     while True:
-        if ball_x > 10:
+        if ball_x > w_width-1:
             x_speed = -1
         if ball_x < 3:
             x_speed = 1
         if ball_y < 1:
             y_speed = 1
-        if ball_y > 6:
+        if ball_y > w_height-2:
             y_speed = -1
         ball_x += x_speed
         ball_y += y_speed
-        check_collisions()
         draw_board()
         get_input()
         position_paddle1()
-        cells[str((ball_y - y_speed))][ball_x - x_speed] = ' '
+        cells[(ball_y - y_speed)][ball_x - x_speed] = ' '
         position_ball()
         sleep(0.1)
         clear()
