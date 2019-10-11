@@ -5,6 +5,8 @@ mykeyboard = Controller()
 import keyboard
 import sys
 
+import random
+
 from cursesmenu.items import *
 from cursesmenu import *
 from curses import panel
@@ -39,7 +41,7 @@ paddle1_y = 3
 paddle2_y = 4
 
 ball_x = 3
-ball_y = 3
+ball_y = random.randint(2,9)
 
 x_speed = 1
 y_speed = 1
