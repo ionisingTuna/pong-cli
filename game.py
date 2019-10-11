@@ -35,9 +35,6 @@ def clear():
     else:
         _ = system('clear')
 
-ball_speed = 25
-randomness = 3
-
 paddle1_y = 3
 paddle2_y = 4
 
@@ -83,7 +80,7 @@ def game():
     global y_speed
     clear()
     while True:
-        if ball_x > w_width-1:
+        if ball_x > w_width-3:
             x_speed = -1
         if ball_x < 3:
             x_speed = 1
