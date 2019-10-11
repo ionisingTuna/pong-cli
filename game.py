@@ -1,7 +1,11 @@
+import sys
 from os import system, name
 import keyboard
 from pynput.keyboard import Key, Controller
 mykeyboard = Controller()
+
+from cursesmenu import *
+from cursesmenu.items import *
 
 import math
 
@@ -24,82 +28,6 @@ cells = {
         '7': [' ', '|', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '|', ' ']
         }
 
-class Menu(object):
-    def __init__(self, items, stdscreen):
-        self.window = stdscreen.subwin(0,0)
-        self.window.keypad(1)
-        self.panel = panel.new_panel(self.window)
-        self.panel.hide()
-        panel.update_panels()
-
-        self.position = 0
-        self.items = items
-        self.items.append(('exit','exit'))
-
-    def navigate(self, n):
-        self.position += n
-        if self.position < 0:
-            self.position = 0
-        elif self.position >= len(self.items):
-            self.position = len(self.items)-1
-    def display(self):                                                       
-      self.panel.top()                                                     
-      self.panel.show()                                                    
-      self.window.clear()                                                  
-
-      while True:                                                          
-        self.window.refresh()                                            
-        curses.doupdate()                                                
-        for index, item in enumerate(self.items):                        
-            if index == self.position:                                   
-              mode = curses.A_REVERSE                                  
-            else:                                                        
-              mode = curses.A_NORMAL                                   
-
-            msg = '%d. %s' % (index, item[0])                            
-            self.window.addstr(1+index, 1, msg, mode)                    
-
-        key = self.window.getch()                                        
-
-        if key in [curses.KEY_ENTER, ord('\n')]:                         
-            if self.position == len(self.items)-1:                       
-              break                                                    
-            else:                                                        
-              self.items[self.position][1]()                           
-
-        elif key == curses.KEY_UP:                                       
-            self.navigate(-1)                                            
-
-        elif key == curses.KEY_DOWN:                                     
-            self.navigate(1)                                             
-
-      self.window.clear()                                                  
-      self.panel.hide()                                                    
-      panel.update_panels()                                                
-      curses.doupdate()
-
-class MyApp(object):                                                         
-
-    def __init__(self, stdscreen):                                           
-        self.screen = stdscreen                                              
-        curses.curs_set(0)                                                   
-
-        submenu_items = [                                                    
-                ('beep', curses.beep),                                       
-                ('flash', curses.flash)                                      
-                ]                                                            
-        submenu = Menu(submenu_items, self.screen)                           
-
-        main_menu_items = [                                                  
-                ('beep', curses.beep),                                       
-                ('flash', curses.flash),                                     
-                ('submenu', submenu.display)                                 
-                ]                                                            
-        main_menu = Menu(main_menu_items, self.screen)                       
-        main_menu.display()                                                  
-
-if __name__ == '__main__':                                                       
-    curses.wrapper(MyApp)
     
 
 
@@ -109,19 +37,6 @@ def clear():
     else:
         _ = system('clear')
 
-ball_speed = 25
-randomness = 3
-
-paddle1_y = 3
-paddle2_y = 4
-
-ball_x = 3
-ball_y = 3
-
-x_speed = 1
-y_speed = 1
-
-ball_sprite = 'O'
 
 def position_paddle1():
     cells[str(paddle1_y)][1] = 'X'
@@ -144,6 +59,8 @@ def get_input():
     if keyboard.is_pressed('k'):
         cells[str(paddle1_y)][1] = '|'
         paddle1_y -= 1
+    if keyboard.is_pressed('z'):
+        sys.exit()
 
 def check_collisions():
     if ball_x < 7:
@@ -151,25 +68,54 @@ def check_collisions():
     elif ball_x > 7:
         ball_sprite = 'R'
 
-'''
-while True:
-    if ball_x > 10:
-        x_speed = -1
-    if ball_x < 3:
-        x_speed = 1
-    if ball_y < 1:
-        y_speed = 1
-    if ball_y > 6:
-        y_speed = -1
-    ball_x += x_speed
-    ball_y += y_speed
-    check_collisions()
-    draw_board()
-    get_input()
-    position_paddle1()
-    cells[str((ball_y - y_speed))][ball_x - x_speed] = ' '
-    position_ball()
-    sleep(0.1)
-    clear()
-'''
+ball_speed = 25
+randomness = 3
 
+paddle1_y = 3
+paddle2_y = 4
+
+ball_x = 3
+ball_y = 3
+
+x_speed = 1
+y_speed = 1
+
+ball_sprite = 'O'
+
+def game():
+    global ball_speed
+    global randomness
+    global paddle1_y
+    global paddle2_y
+    global ball_x
+    global ball_y
+    global x_speed
+    global y_speed
+    clear()
+    while True:
+        if ball_x > 10:
+            x_speed = -1
+        if ball_x < 3:
+            x_speed = 1
+        if ball_y < 1:
+            y_speed = 1
+        if ball_y > 6:
+            y_speed = -1
+        ball_x += x_speed
+        ball_y += y_speed
+        check_collisions()
+        draw_board()
+        get_input()
+        position_paddle1()
+        cells[str((ball_y - y_speed))][ball_x - x_speed] = ' '
+        position_ball()
+        sleep(0.1)
+        clear()
+
+menu = CursesMenu("Title", "Subtitle")
+function_item = FunctionItem("Play the Game", game)
+
+menu.append_item(function_item)
+
+if __name__ == '__main__':                                                       
+    menu.show()
